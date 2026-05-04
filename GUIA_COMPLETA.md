@@ -126,3 +126,61 @@ docker ps debe mostrar:
   zookeeper_lab
   superset_lab
   portainer_lab
+
+
+## pubñicación Linkedin
+
+🏗️ Construí una Enterprise Data Platform completa desde cero — 100% local, 100% open source
+
+Durante los últimos días monté un laboratorio de Data Engineering completo sobre Docker + WSL Ubuntu. El resultado es una plataforma enterprise real con 7 capas de arquitectura funcionando en simultáneo.
+
+📐 La arquitectura completa:
+
+1️⃣ Ingesta en tiempo real
+Apache Kafka recibe eventos desde cualquier fuente (CSV, APIs, IoT, apps). Kafka UI permite monitorear los topics en vivo.
+
+2️⃣ Almacenamiento operacional
+PostgreSQL almacena los datos procesados. pgAdmin permite administración visual completa.
+
+3️⃣ Transformación y modelado
+dbt transforma los datos con SQL puro. Genera documentación automática y lineage graph de los modelos.
+
+4️⃣ Data Lake (S3 compatible)
+MinIO almacena los archivos en buckets organizados:
+- `raw-data` → datos crudos
+- `data-lake` → almacenamiento general
+- `analytics` → datos procesados
+- `backups` → respaldos
+
+5️⃣ Consumo y visualización
+Apache Superset y Grafana exponen dashboards para usuarios de negocio, analistas y científicos de datos.
+
+6️⃣ Orquestación y automatización
+Apache Airflow orquesta todo el flujo: extracción, transformación, carga, scheduling, monitoreo y alertas.
+
+7️⃣ Monitoreo y observabilidad
+Prometheus recolecta métricas. Grafana visualiza infraestructura, contenedores, pipelines y alertas en tiempo real.
+
+🔧 Infraestructura base
+Docker + Portainer + WSL Ubuntu — stack completo corriendo localmente.
+
+*¿Por qué construirlo así?
+
+Antes de usar plataformas que abstraen todo (Microsoft Fabric, Databricks, AWS Glue), entender cada capa por separado marca la diferencia entre operar una herramienta y entender una arquitectura.
+
+Problemas reales resueltos:
+- Redes Docker aisladas entre stacks → conectividad manual
+- Hostname resolution en Kafka desde WSL
+- Permisos en volúmenes montados desde Windows
+- Migración de base de datos Airflow corrupta
+
+🛠️ Stack completo:
+Kafka · PostgreSQL · dbt · MinIO · Airflow · Superset · Grafana · Prometheus · Docker · Portainer · pgAdmin
+
+Integraciones futuras planeadas:
+MLflow · Spark · Elasticsearch · ClickHouse · n8n
+
+
+
+
+✅ Stack completo 100% local · Open Source · Escalable · Modular · Listo para producción

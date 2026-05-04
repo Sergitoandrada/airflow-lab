@@ -1,0 +1,54 @@
+from airflow import DAG
+from airflow.operators.bash import BashOperator
+from datetime import datetime
+
+default_args = {
+    "owner": "sergio",
+    "start_date": datetime(2026, 4, 1),
+    "retries": 1
+}
+
+with DAG(
+    dag_id="pipeline_ventas_demo",
+    default_args=default_args,
+    schedule_interval=None,
+    catchup=False,
+    tags=["postgres", "dbt", "minio", "superset"]
+) as dag:
+
+    inicio = BashOperator(
+        task_id="inicio_pipeline",
+        bash_command="echo 'Iniciando pipeline enterprise...'"
+    )
+postgres_insert = BashOperator(
+    task_id="postgres_insert",
+    bash_command="""
+docker exec postgres_lab psql -U admin -d labdb -c "INSERT INTO ventas_demo (fecha, cliente, producto, cantidad, total) VALUES ('2026-04-29', 'Cliente Airflow', 'Hierro', 25, 95000);"
+"""    
+)
+    ejecutar_dbt = BashOperator(
+        task_id="ejecutar_dbt",
+        bash_command="""
+        echo 'Ejecutando dbt...'
+        """
+    )
+
+    upload_minio = BashOperator(
+        task_id="upload_minio",
+        bash_command="""
+        echo 'Simulando upload a MinIO...'
+        """
+    )
+    superset_refresh = BashOperator(
+        task_id="superset_refresh",
+        bash_command="""
+        echo 'Superset actualizado automáticamente'
+        """
+    )
+
+    fin = BashOperator(
+        task_id="fin_pipeline",
+        bash_command="echo 'Pipeline enterprise finalizado correctamente'"
+    )
+
+    inicio >> postgres_insert >> ejecutar_dbt >> upload_minio >> superset_refresh >> fin

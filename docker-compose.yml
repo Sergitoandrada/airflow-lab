@@ -1,0 +1,66 @@
+version: '3.7'
+
+x-airflow-common:
+  &airflow-common
+  image: apache/airflow:2.7.3
+  environment:
+    &airflow-common-env
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow_postgres/airflow
+    AIRFLOW__CORE__FERNET_KEY: ''
+    AIRFLOW__WEBSERVER__SECRET_KEY: 'mysecretkey'
+    _PIP_ADDITIONAL_REQUIREMENTS: psycopg2-binary dbt-postgres minio
+  volumes:
+    - ./dags:/opt/airflow/dags
+    - ./logs:/opt/airflow/logs
+    - ./plugins:/opt/airflow/plugins
+    - ./dbt:/opt/airflow/dbt
+  depends_on:
+    - airflow_postgres
+  networks:
+    - airflow-lab_default
+    - portainer_default
+    - minio-lab_default
+
+services:
+  airflow_postgres:
+    image: postgres:15
+    container_name: airflow_postgres
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - postgres-db-volume:/var/lib/postgresql/data
+    networks:
+      - airflow-lab_default
+
+  airflow-webserver:
+    <<: *airflow-common
+    container_name: airflow_webserver
+    command: webserver
+    ports:
+      - "8081:8080"
+
+  airflow-scheduler:
+    <<: *airflow-common
+    container_name: airflow_scheduler
+    command: scheduler
+
+  airflow-init:
+    <<: *airflow-common
+    container_name: airflow_init
+    command: >
+      bash -c "airflow db init && airflow users create --username admin --password sergio546119 --firstname Sergio --lastname Andrada --role Admin --email admin@mail.com"
+
+volumes:
+  postgres-db-volume:
+
+networks:
+  airflow-lab_default:
+    driver: bridge
+  portainer_default:
+    external: true
+  minio-lab_default:
+    external: true
